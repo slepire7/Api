@@ -19,11 +19,7 @@ namespace Api.Controllers
             var repositoryProd = Infra.Config.Inject.Load<IRepository<Core.Models.Produto>>();
             var _produto = new Core.Models.Produto()
             {
-                Id = Guid.NewGuid(),
-                Nome = produto.Nome,
-                DataAtualizacao = DateTime.Now.SetKindUtc(),
-                DataCadastro = DateTime.Now.SetKindUtc(),
-                DataExclusao = null
+                Nome = produto.Nome
             };
             await repositoryProd.InsertAsync(_produto);
             return Ok(_produto);
@@ -50,10 +46,22 @@ namespace Api.Controllers
             if (_produto is not null)
             {
                 _produto.Nome = addProduto.Nome;
-                _produto.DataAtualizacao = DateTime.Now.SetKindUtc();
                 await repositoryProd.UpdateAsync(_produto);
+                return Ok(_produto);
             }
-            return Ok(_produto);
+            return NotFound();
+        }
+        [HttpDelete]
+        public async Task<IActionResult> DeleteProduto([FromQuery] Guid IdProduto)
+        {
+            var repositoryProd = Infra.Config.Inject.Load<IRepository<Core.Models.Produto>>();
+            var _produto = await repositoryProd.GetAsync(IdProduto);
+            if (_produto is not null)
+            {
+                await repositoryProd.DeleteRowAsync(_produto.Id);
+                return Ok();
+            }
+            return NotFound();
         }
 
     }

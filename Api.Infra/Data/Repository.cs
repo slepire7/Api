@@ -1,5 +1,6 @@
 ﻿using Api.Core.Interfaces;
 using Api.Core.Utils;
+using Api.Infra.Data.DapperExtension;
 using Dapper;
 using Npgsql;
 using System;
@@ -40,9 +41,9 @@ namespace Api.Infra.Data
         {
             int offset = GetOffset(pageSize, pageNumber);
             string sql = @$"SELECT COUNT(0) FROM public.""{_tableName}"";
-            SELECT * FROM public.""{_tableName}\""
-            ""OFFSET @Offset ROWS "";
-            ""FETCH NEXT @PageSize ROWS ONLY""";
+            SELECT * FROM public.""{_tableName}""
+            OFFSET @Offset ROWS
+            FETCH NEXT @PageSize ROWS ONLY";
 
             using var connection = CreateConnection();
             var multi = await connection.QueryMultipleAsync(sql, new { pageSize, offset });
@@ -52,6 +53,8 @@ namespace Api.Infra.Data
         }
         private static int GetOffset(int pageSize, int pageNumber)
         {
+            if (pageNumber == 0)
+                pageNumber = 1;
             return (pageNumber - 1) * pageSize;
         }
         protected async Task<T> DbAction(Func<IDbConnection, Task<T>> action)
@@ -66,7 +69,7 @@ namespace Api.Infra.Data
         {
             using (var connection = CreateConnection())
             {
-                await connection.ExecuteAsync($"DELETE FROM \"{_tableName}\" WHERE \"Id\"=@Id", new { Id = id });
+                await connection.SaveChanges($"DELETE FROM \"{_tableName}\" WHERE \"Id\"=@Id", id);
             }
         }
 
@@ -84,7 +87,7 @@ namespace Api.Infra.Data
 
             using (var connection = CreateConnection())
             {
-                await connection.ExecuteAsync(updateQuery, t);
+                await connection.SaveChanges(updateQuery, t);
             }
         }
 
@@ -123,7 +126,7 @@ namespace Api.Infra.Data
 
             using (var connection = CreateConnection())
             {
-                await connection.ExecuteAsync(insertQuery, t);
+                await connection.SaveChanges(insertQuery, t);
             }
         }
         private IEnumerable<PropertyInfo> GetProperties => typeof(T).GetProperties();

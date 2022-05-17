@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Api.Core.Interfaces;
+using Api.Infra.Service;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -11,7 +13,9 @@ namespace Api.Extension
     {
         public static IServiceCollection GetAppServices(this IServiceCollection services)
         {
-            services.AddSingleton(typeof(Core.Interfaces.IRepository<>), typeof(Infra.Data.Repository<>));
+            services.AddSingleton(typeof(IRepository<>), typeof(Infra.Data.Repository<>));
+            services.AddSingleton<IProdutoService, ProdutoService>();
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             return services;
         }
         public static void SetConfigInfra(this IServiceCollection services, IConfiguration configuration)

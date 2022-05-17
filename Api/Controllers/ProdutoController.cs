@@ -1,5 +1,6 @@
 ﻿using Api.Core.Interfaces;
 using Api.Extension;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -16,19 +17,17 @@ namespace Api.Controllers
         [HttpPost]
         public async Task<IActionResult> NewProduto([FromBody] Core.DTOs.Produto.AddProduto produto)
         {
+            var _mapper = Infra.Config.Inject.Load<IMapper>();
             var repositoryProd = Infra.Config.Inject.Load<IRepository<Core.Models.Produto>>();
-            var _produto = new Core.Models.Produto()
-            {
-                Nome = produto.Nome
-            };
+            var _produto = _mapper.Map<Core.Models.Produto>(produto);
             await repositoryProd.InsertAsync(_produto);
             return Ok(_produto);
         }
         [HttpGet]
         public async Task<IActionResult> GetProduto([FromQuery] Guid IdProduto)
         {
-            var repositoryProd = Infra.Config.Inject.Load<IRepository<Core.Models.Produto>>();
-            var _produto = await repositoryProd.GetAsync(IdProduto);
+            var produtoService = Infra.Config.Inject.Load<IProdutoService>();
+            var _produto = await produtoService.GetReadProduto(IdProduto);
             return Ok(_produto);
         }
         [HttpGet("all")]

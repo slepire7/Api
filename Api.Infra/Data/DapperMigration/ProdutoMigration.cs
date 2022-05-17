@@ -13,7 +13,8 @@ namespace Api.Infra.Data.DapperMigration
                 .WithColumn("Nome").AsString()
                 .WithColumn("DataCadastro").AsDateTime2().Nullable()
                 .WithColumn("DataAtualizacao").AsDateTime2().Nullable()
-                .WithColumn("DataExclusao").AsDateTime2().Nullable();
+                .WithColumn("DataExclusao").AsDateTime2().Nullable()
+                .WithColumn("CategoriaId").AsGuid().NotNullable().ForeignKey("Categoria", "Id");
         }
         public override void Down()
         {

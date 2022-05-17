@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Api.Core.Models
 {
-    [Table("Produto")]
-    public class Produto : BaseEntity
+    [Table("Categoria")]
+    public class Categoria : BaseEntity
     {
         public string Nome { get; set; }
-        public Guid CategoriaId { get; set; }
+        public string Descricao { get; set; }
     }
 }

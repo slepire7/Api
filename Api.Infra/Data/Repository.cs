@@ -6,6 +6,7 @@ using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Linq;
 using System.Reflection;
@@ -153,10 +154,8 @@ namespace Api.Infra.Data
         }
         private static List<string> GenerateListOfProperties(IEnumerable<PropertyInfo> listOfProperties)
         {
-            return (from prop in listOfProperties
-                    let attributes = prop.GetCustomAttributes(typeof(DescriptionAttribute), false)
-                    where attributes.Length <= 0 || (attributes[0] as DescriptionAttribute)?.Description != "ignore"
-                    select prop.Name).ToList();
+
+            return listOfProperties.Where(o => o.GetCustomAttribute(typeof(ColumnAttribute), false) != null).Select(o=> o.Name).ToList();
         }
     }
 }

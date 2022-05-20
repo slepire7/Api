@@ -10,7 +10,9 @@ namespace Api.Core.Models
     [Table("Categoria")]
     public class Categoria : BaseEntity
     {
+        [Column("Nome")]
         public string Nome { get; set; }
+        [Column("Descricao")]
         public string Descricao { get; set; }
     }
 }

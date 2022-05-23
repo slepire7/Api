@@ -14,5 +14,6 @@ namespace Api.Core.Models
         public string Nome { get; set; }
         [Column("CategoriaId")]
         public Guid CategoriaId { get; set; }
+        public Categoria Categoria { get; set; }
     }
 }

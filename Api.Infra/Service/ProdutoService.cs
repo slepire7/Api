@@ -2,23 +2,24 @@
 using Api.Core.Interfaces;
 using AutoMapper;
 using System;
+using Dapper;
+using Dommel;
 using System.Threading.Tasks;
 
 namespace Api.Infra.Service
 {
     public class ProdutoService : IProdutoService
     {
-        public async Task<ReadProduto> GetReadProduto(Guid IdProduto)
+        public Task<Core.Models.Produto> GetReadProduto(Guid IdProduto)
         {
             var _mapper = Config.Inject.Load<IMapper>();
 
             var repoProduto = Config.Inject.Load<IRepository<Core.Models.Produto>>();
-            var repoCategoria = Config.Inject.Load<IRepository<Core.Models.Categoria>>();
 
-            var produto = _mapper.Map<ReadProduto>(await repoProduto.GetAsync(IdProduto));
-            var categoria = _mapper.Map<Core.DTOs.Categoria.ReadCategoria>(await repoCategoria.GetAsync(produto.CategoriaId));
-            produto.Categoria = categoria;
-            return produto;
+            return repoProduto.DbAction(async (ctx) =>
+            {
+                return await ctx.GetAsync<Core.Models.Produto, Core.Models.Categoria, Core.Models.Produto>(IdProduto);
+            });
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using Api.Core.Interfaces;
 using Api.Core.Utils;
 using Api.Infra.Data.DapperExtension;
+using Api.Infra.Data.DapperResolver;
 using Dapper;
+using Dommel;
 using Npgsql;
 using System;
 using System.Collections.Generic;
@@ -17,6 +19,11 @@ namespace Api.Infra.Data
 {
     public class Repository<T> : IRepository<T> where T : Core.Models.BaseEntity
     {
+        public Repository()
+        {
+            DommelMapper.SetTableNameResolver(new CustomTableNameResolver());
+            DommelMapper.SetColumnNameResolver(new CustomColumnNameResolver());
+        }
 
         private readonly string _tableName = typeof(T).Name;
         private NpgsqlConnection NpgsqlConnection()
@@ -58,7 +65,7 @@ namespace Api.Infra.Data
                 pageNumber = 1;
             return (pageNumber - 1) * pageSize;
         }
-        protected async Task<T> DbAction(Func<IDbConnection, Task<T>> action)
+        public async Task<T> DbAction(Func<IDbConnection, Task<T>> action)
         {
             using (var connection = CreateConnection())
             {
@@ -78,7 +85,7 @@ namespace Api.Infra.Data
         {
             using (var connection = CreateConnection())
             {
-                var result = await connection.QuerySingleOrDefaultAsync<T>($"SELECT * FROM public.\"{_tableName}\" WHERE \"Id\"=@Id", new { Id = id });
+                var result = await connection.GetAsync<T>(id);
                 return result;
             }
         }
@@ -155,7 +162,7 @@ namespace Api.Infra.Data
         private static List<string> GenerateListOfProperties(IEnumerable<PropertyInfo> listOfProperties)
         {
 
-            return listOfProperties.Where(o => o.GetCustomAttribute(typeof(ColumnAttribute), false) != null).Select(o=> o.Name).ToList();
+            return listOfProperties.Where(o => o.GetCustomAttribute(typeof(ColumnAttribute), false) != null).Select(o => o.Name).ToList();
         }
     }
 }

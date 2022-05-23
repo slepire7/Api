@@ -8,7 +8,7 @@ namespace Api.Core.Interfaces
 {
     public interface IProdutoService
     {
-        Task<DTOs.Produto.ReadProduto> GetReadProduto(Guid IdProduto);
+        Task<Core.Models.Produto> GetReadProduto(Guid IdProduto);
 
     }
 }

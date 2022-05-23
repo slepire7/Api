@@ -17,5 +17,6 @@ namespace Api.Core.Interfaces
         Task<int> SaveRangeAsync(IEnumerable<T> list);
         Task UpdateAsync(T t);
         Task InsertAsync(T t);
+        Task<T> DbAction(Func<IDbConnection, Task<T>> action);
     }
 }

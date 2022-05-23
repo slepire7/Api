@@ -14,5 +14,6 @@ namespace Api.Core.Models
         public string Nome { get; set; }
         [Column("Descricao")]
         public string Descricao { get; set; }
+        public List<Produto> Produtos { get; set; }
     }
 }
